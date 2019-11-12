@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import io.vavr.control.Option;
 import org.springframework.web.bind.annotation.*;
-import warriors.contracts.GameState;
-import warriors.contracts.Hero;
-import warriors.contracts.Map;
-import warriors.contracts.WarriorsAPI;
+import warriors.contracts.*;
 import warriors.engine.Game;
 import warriors.engine.Warriors;
 import warriors.model.Warrior;
@@ -57,8 +55,10 @@ public class RequestController {
         return api.createGame((String) payload.get("playerName"), hero, map);
     }
 
-//créer objets hero et map à partir des names
-//récup listes héros et maps
-//créer liste games
-//ajouter game dans liste games
+    @PostMapping("/games/{id}/turn")
+    Option<GameState> gameStateId (@PathVariable String id){
+        GameId gameId = GameId.parse(id);
+        return api.nextTurn(gameId);
+    }
+
 }
