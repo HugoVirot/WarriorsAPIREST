@@ -1,4 +1,4 @@
-package hello;
+package warriorsapirest;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -12,9 +12,6 @@ import warriors.engine.Warriors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import warriors.model.BaseCase;
-import warriors.model.EmptyCase;
-import warriors.model.MapModel;
 
 @RestController
 public class RequestController<Games> {
@@ -42,11 +39,9 @@ public class RequestController<Games> {
     }
 
     //    https://stackoverflow.com/questions/29313687/trying-to-use-spring-boot-rest-to-read-json-string-from-post
-    @CrossOrigin(origins = "http://localhost:63342")
     @PostMapping("/games")
     public GameState createGame(@RequestBody java.util.Map<String, Object> payload) {
         System.out.println(payload);
-
         Iterable<Hero> heroList = api.availableHeroes();
         List<Hero> heroesList = new ArrayList<Hero>();
         heroList.forEach(heroesList::add);
@@ -62,25 +57,20 @@ public class RequestController<Games> {
         return api.createGame((String) payload.get("playerName"), hero, map);
     }
 
-    @CrossOrigin(origins = "http://localhost:63342")
-    @PostMapping("/games/{id}/turn")
-    Option<GameState> gameStateId (@PathVariable String id){
+    @PostMapping("/games/{id}/turns")
+    Option<GameState> turns (@PathVariable String id){
         logger.info(id);
         GameId gameId = GameId.parse(id);
         return api.nextTurn(gameId);
     }
 
-//    Option<Game> show(GameId gameId);
-//    Iterable<Game> listGames();
 
-    @CrossOrigin(origins = "http://localhost:63342")
-    @GetMapping("/games/{id}")        // affiche l'état d'une partie en cours (actualisation)
+    @GetMapping("/games/{id}")        // affiche l'état d'une partie en cours (actualisation) : OK
     Option<Game> showGame (@PathVariable String id){
         GameId gameId = GameId.parse(id);
         return api.show(gameId);
     }
 
-    @CrossOrigin(origins = "http://localhost:63342")
     @GetMapping("/games")            // affiche liste parties en cours (bouton Observe games)
     List<Game> getGames() {
         Iterable<Game> gameList = api.listGames();
