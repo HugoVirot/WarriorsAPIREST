@@ -1,5 +1,7 @@
 package testpackage;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import warriorsapirest.WarriorsApirestApplication;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +32,9 @@ public class RequestControllerTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private MockMvc mockMvc;
 
@@ -69,18 +74,18 @@ public class RequestControllerTest {
 
     @Test
     public void checkGameState() throws Exception {
-        MvcResult result = mockMvc.perform(post("/games")              //créer partie -> il faut récupérer l'id
+        MvcResult result = mockMvc.perform(post("/games")
                 .content("{\"playerName\": \"toto\", \"hero\": 0, \"map\": 0}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isCreated())          //il faut renvoyer code 201 au lieu de 200
                 .andReturn();
-        String content = result.getResponse().getContentAsString();
-        String id = content.substring(12,48);      //ne marche pas (id de longueur variable)
-        logger.info(id);
-        mockMvc.perform(get("/games/{id}")         //la récupérer à l'aide de l'id
-                .param("id", id))
-                .andExpect(status().isCreated());
-    }
 
+        JsonNode jsonNode = objectMapper.readTree(result.getResponse().getContentAsString());
+        String gameId = jsonNode.get("gameId").asText();
+        System.out.println(gameId);
+
+        mockMvc.perform(get("/games/{id}")
+                .param("id", gameId))
+                .andExpect(status().isOk());
+    }
 }
